@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+  annotations:
+    configmap.reloader.stakater.com/reload: "example-page"
+spec:
+  selector:
+    matchLabels:
+      app: example
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: example
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name: page
+            mountPath: "/usr/share/nginx/html"
+      initContainers:
+        - name: wait-for-migration
+          image: groundnuty/k8s-wait-for:v1.3
+          args:
+            - "job"
+            - "migration"
+          volumeMounts:
+            - name: job-reader-token
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              readOnly: true
+      volumes:
+        - name: page
+          configMap:
+            name: example-page
+            items:
+              - key: "index"
+                path: "index.html"
+        - name: job-reader-token
+          secret:
+            secretName: job-reader-secret

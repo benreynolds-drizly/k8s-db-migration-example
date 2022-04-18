@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migration
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      containers:
+      - name: migrator
+        image: bash
+        command: ["bash","-c"]
+        args: ["echo 'Starting a migration...'; for i in {0..10}; do sleep 3; echo 'migrating...'; done; echo 'Done!'"]
+      restartPolicy: Never
+  backoffLimit: 4

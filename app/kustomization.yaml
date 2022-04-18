@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: example
+
+resources:
+  - namespace.yaml
+  - job-reader-sa.yaml
+  - page-cm.yaml
+  - migration-job.yaml
+  - deployment.yaml
+  - service.yaml
